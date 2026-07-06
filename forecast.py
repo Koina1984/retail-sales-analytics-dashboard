@@ -1,9 +1,11 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
+# Load cleaned data
 df = pd.read_csv("data/processed/cleaned_sales.csv")
 
+# Monthly Revenue
 monthly_sales = (
     df.groupby("Month")["Revenue"]
     .sum()
@@ -13,13 +15,23 @@ monthly_sales = (
 X = monthly_sales[["Month"]]
 y = monthly_sales["Revenue"]
 
+# Train Model
 model = LinearRegression()
 model.fit(X, y)
 
-future_months = np.array([[13], [14], [15]])
+# Predict Next 3 Months
+future = pd.DataFrame({
+    "Month": [13, 14, 15]
+})
 
-predictions = model.predict(future_months)
+future["Predicted_Revenue"] = model.predict(future)
 
-print("Forecast:")
-for i, pred in enumerate(predictions, start=13):
-    print(f"Month {i}: {pred:.2f}")
+print(future)
+
+# Save Prediction
+future.to_csv(
+    "data/processed/forecast.csv",
+    index=False
+)
+
+print("\nForecast saved successfully!")
